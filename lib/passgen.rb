@@ -136,6 +136,7 @@ module Passgen
       uppercase:     true,
       digits:        true,
       symbols:       false,
+      symbols_list:  SYMBOLS_TOKENS,
       pronounceable: false
   }
 
@@ -270,7 +271,7 @@ module Passgen
       params[:uppercase] = false
     end
 
-    if params[:symbols] == :only
+    if params[:symbols] == :only || params[:symbols] == :list
       params[:lowercase] = false
       params[:uppercase] = false
       params[:digits]    = false
@@ -298,10 +299,6 @@ module Passgen
     end
   end
 
-  def self.symbol_tokens
-    %w{! @ # $ % & / ( ) + ? *}
-  end
-
   def self.use_lowercase?
     @options[:lowercase]
   end
@@ -318,12 +315,16 @@ module Passgen
     @options[:symbols]
   end
 
+  def self.use_symbols_list?
+    @options[:symbols] && @options[:symbols_list].is_a?(Array)
+  end
+
   def self.valid_tokens
     tmp = []
     tmp += LOWERCASE_TOKENS if use_lowercase?
     tmp += UPPERCASE_TOKENS if use_uppercase?
     tmp += DIGIT_TOKENS if use_digits?
-    tmp += symbol_tokens if use_symbols?
+    tmp += use_symbols_list? ? @options[:symbols_list] : SYMBOLS_TOKENS if @options[:symbols]
     tmp
   end
 end
